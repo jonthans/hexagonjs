@@ -35,7 +35,7 @@ class Graph extends hx.EventEmitter
 
     selection = hx.select(@selector)
 
-    if @_.options.redrawOnResize then selection.on 'resize', 'hx.plot', => @render()
+    selection.on 'resize', 'hx.plot', => if @_.options.redrawOnResize then @render()
     @svgTarget = selection.append("svg").attr('class', 'hx-graph')
     defs = @svgTarget.append('defs')
     @axesTarget = @svgTarget.append('g').attr('class', 'hx-axes')

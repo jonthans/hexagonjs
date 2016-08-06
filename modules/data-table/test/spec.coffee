@@ -1837,6 +1837,54 @@ describe 'data-table', ->
             clock.restore()
 
 
+    ###
+  selection = hx.select('body').append('div')
+        .style 'width', '500px'
+        .style 'height', '500px'
+      graph = new hx.Graph(selection.node(), redrawOnResize: false)
+      axis = graph.addAxis(x: { title: 'foo' }, y: { title: 'bar' })
+      axis.addSeries('line', data: [{ x: 0, y: 1 }])
+      graph.render()
+
+      renderSpy = chai.spy()
+      graph.on 'render', renderSpy
+      selection.style 'width', '400px'
+      testHelpers.fakeNodeEvent(selection.node(), 'resize')()
+      renderSpy.should.not.have.been.called()
+###
+    describe 'redrawonresize', ->
+      it 'should redraw the table on resizing the container by default', ->
+        container = hx.select('body').append('div').style('width', '1000px').style('height', '500px')
+        dt = new hx.DataTable(container.node())
+        dt.feed(threeRowsData)
+
+        renderSpy = chai.spy()
+        dt.on 'render', renderSpy
+        container.style 'width', '400px'
+        testHelpers.fakeNodeEvent(container.node(), 'resize')()
+        renderSpy.should.have.been.called()
+
+      it 'should not redraw the table on resizing the container if told not to', ->
+        container = hx.select('body').append('div').style('width', '1000px').style('height', '500px')
+        dt = new hx.DataTable(container.node(), redrawOnResize: false)
+        dt.feed(threeRowsData)
+
+        renderSpy = chai.spy()
+        dt.on 'render', renderSpy
+        container.style 'width', '400px'
+        testHelpers.fakeNodeEvent(container.node(), 'resize')()
+        renderSpy.should.not.have.been.called()
+
+      it 'should redraw the table when changing the redrawOnResize option', ->
+        container = hx.select('body').append('div').style('width', '1000px').style('height', '500px')
+        dt = new hx.DataTable(container.node(), redrawOnResize: true)
+        dt.feed(threeRowsData)
+
+        renderSpy = chai.spy()
+        dt.on 'render', renderSpy
+        dt.redrawOnResize false
+        renderSpy.should.have.been.called()
+        dt.redrawOnResize().should.be.true()
 
 
   describe 'rowsForIds', ->

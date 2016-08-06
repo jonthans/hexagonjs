@@ -262,6 +262,7 @@ class DataTable extends hx.EventEmitter
 
       advancedSearchText: hx.userFacingText('dataTable','advancedSearch')
       advancedSearchPlaceholder: hx.userFacingText('dataTable', 'search')
+      redrawOnResize: true
     }, options)
 
     resolvedOptions.pageSize = Math.min resolvedOptions.pageSize, 1000
@@ -437,14 +438,17 @@ class DataTable extends hx.EventEmitter
 
     # responsive page resize when compact is 'auto'
     selection.on 'resize', 'hx.data-table', =>
-      selection.selectAll('.hx-data-table-collapsible-content-container').map (e) =>
-        e.style('max-width', (parseInt(selection.style('width')) - @_.collapsibleSizeDiff) + 'px')
+      console.log(@_.options)
+      if @_.options.redrawOnResize
+        console.log('redrawing')
+        selection.selectAll('.hx-data-table-collapsible-content-container').map (e) =>
+          e.style('max-width', (parseInt(selection.style('width')) - @_.collapsibleSizeDiff) + 'px')
 
-      state = (@compact() is 'auto' and selection.width() < collapseBreakPoint) or @compact() is true
-      selection.classed 'hx-data-table-compact', state
-      if @_.compactState isnt state
-        @_.compactState = state
-        @emit('compactchange', {value: @compact(), state: state, cause: 'user'})
+        state = (@compact() is 'auto' and selection.width() < collapseBreakPoint) or @compact() is true
+        selection.classed 'hx-data-table-compact', state
+        if @_.compactState isnt state
+          @_.compactState = state
+          @emit('compactchange', {value: @compact(), state: state, cause: 'user'})
 
     randomId = hx.randomId()
 
@@ -488,6 +492,7 @@ class DataTable extends hx.EventEmitter
   noDataMessage: option('noDataMessage')
   pageSize: option('pageSize')
   pageSizeOptions: option('pageSizeOptions')
+  redrawOnResize: option('redrawOnResize')
   retainHorizontalScrollOnRender: option('retainHorizontalScrollOnRender')
   retainVerticalScrollOnRender: option('retainVerticalScrollOnRender')
   rowCollapsibleLookup: option('rowCollapsibleLookup')
